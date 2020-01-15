@@ -1,6 +1,8 @@
 package com.test.util;
 
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisUtil {
 
@@ -50,12 +52,12 @@ public class RedisUtil {
      * 获取Jedis实例
      */
 
-    public synchronized static RedisProperties.Jedis getJedis() {
+    public synchronized static Jedis getJedis() {
 
         try {
 
             if (jedisPool != null) {
-                RedisProperties.Jedis resource = jedisPool.getResource();
+                Jedis resource = jedisPool.getResource();
                 System.out.println("redis--服务正在运行: "+resource.ping());
                 return resource;
             } else {
