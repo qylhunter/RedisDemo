@@ -5,9 +5,8 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisUtil {
-
     //服务器IP地址
-    private static String ADDR = "192.168.41.65";
+    private static String ADDR = "localhost";
     //端口
     private static int PORT = 6379;
     //密码
@@ -26,60 +25,47 @@ public class RedisUtil {
     private static JedisPool jedisPool = null;
     //数据库模式是16个数据库 0~15
     public static final int DEFAULT_DATABASE = 0;
+
     /**
      * 初始化Redis连接池
      */
-
     static {
-
         try {
-
             JedisPoolConfig config = new JedisPoolConfig();
             config.setMaxTotal(MAX_ACTIVE);
             config.setMaxIdle(MAX_IDLE);
             config.setMaxWaitMillis(MAX_WAIT);
             config.setTestOnBorrow(TEST_ON_BORROW);
-            jedisPool = new JedisPool(config, ADDR, PORT, TIMEOUT,AUTH,DEFAULT_DATABASE);
-
+            jedisPool = new JedisPool(config, ADDR, PORT, TIMEOUT, AUTH, DEFAULT_DATABASE);
         } catch (Exception e) {
-
             e.printStackTrace();
         }
-
     }
 
     /**
      * 获取Jedis实例
      */
-
     public synchronized static Jedis getJedis() {
-
         try {
-
             if (jedisPool != null) {
                 Jedis resource = jedisPool.getResource();
-                System.out.println("redis--服务正在运行: "+resource.ping());
+                System.out.println("redis--服务正在运行: " + resource.ping());
                 return resource;
             } else {
                 return null;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-
     }
 
     /***
-     *
      * 释放资源
      */
-
     public static void returnResource(final Jedis jedis) {
-        if(jedis != null) {
+        if (jedis != null) {
             jedisPool.returnResource(jedis);
         }
-
     }
 }
