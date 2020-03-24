@@ -23,15 +23,15 @@ public class RedisCacheDataBreak {
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 
-    List<InetSocketAddress> address = new ArrayList();
-    MemcachedClient memcachedClient;
-    {
-        try {
-            memcachedClient = new MemcachedClient(address);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    List<InetSocketAddress> address = new ArrayList();
+//    MemcachedClient memcachedClient;
+//    {
+//        try {
+//            memcachedClient = new MemcachedClient(address);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 缓存击穿方案一：互斥锁 mutex - 使用jedis的互斥锁
@@ -70,29 +70,29 @@ public class RedisCacheDataBreak {
         return result;
     }
 
-    /**
-     * 缓存击穿方案一：互斥锁 mutex - 使用memcached的互斥锁
-     * @param key
-     * @param value
-     * @return
-     * @throws InterruptedException
-     */
-    public String memcachedMutex(String key, String value) throws InterruptedException {
-        //search cache
-        String result = redisTemplate.opsForValue().get(key);
-        if (result == null) {
-            if (memcachedClient.add(key, 3 * 60 * 1000, value).isDone()) {
-                //search data source
-                result = DataOperation.getDBValue(key);
-                redisTemplate.opsForValue().set(key, result);
-                redisTemplate.delete(key);
-                return result;
-            } else {
-                // 其它线程进来了没获取到锁便等待50ms，等待其他线程回设缓存，再重试
-                Thread.sleep(50);
-                memcachedMutex(key, value);
-            }
-        }
-        return result;
-    }
+//    /**
+//     * 缓存击穿方案一：互斥锁 mutex - 使用memcached的互斥锁
+//     * @param key
+//     * @param value
+//     * @return
+//     * @throws InterruptedException
+//     */
+//    public String memcachedMutex(String key, String value) throws InterruptedException {
+//        //search cache
+//        String result = redisTemplate.opsForValue().get(key);
+//        if (result == null) {
+//            if (memcachedClient.add(key, 3 * 60 * 1000, value).isDone()) {
+//                //search data source
+//                result = DataOperation.getDBValue(key);
+//                redisTemplate.opsForValue().set(key, result);
+//                redisTemplate.delete(key);
+//                return result;
+//            } else {
+//                // 其它线程进来了没获取到锁便等待50ms，等待其他线程回设缓存，再重试
+//                Thread.sleep(50);
+//                memcachedMutex(key, value);
+//            }
+//        }
+//        return result;
+//    }
 }
