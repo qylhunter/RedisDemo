@@ -8,4 +8,7 @@ redis各问题部分解决方案
 3、雪崩效应
 
 布隆过滤器
+
+resources包下存放改redis的conf文件
+
 ``
